@@ -1,15 +1,17 @@
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-
+using Sat.Recruitment.Core.Abstraction;
+using Sat.Recruitment.Core.Builder;
+using Sat.Recruitment.Core.Factories;
+using Sat.Recruitment.Core.Interfaces;
+using Sat.Recruitment.Core.Normalize;
+using Sat.Recruitment.Core.Servicies;
+using Sat.Recruitment.Infrastructure.Repository;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Sat.Recruitment.Api
 {
@@ -27,6 +29,20 @@ namespace Sat.Recruitment.Api
         {
             services.AddControllers();
             services.AddSwaggerGen();
+
+
+            services.AddTransient<IUserServicies, UserServicies>();
+            services.AddTransient<IUserFileRepository, UserFileRepository>();
+            services.AddTransient<IUserMoneyResolverFactory, UserMoneyResolverFactory>();
+
+            services.AddTransient<IUserBuilder, UserBuilder>();
+            services.AddTransient<INormalize, Normalize>();
+
+            services.AddMvc().AddFluentValidation(options =>
+            {
+                options.RegisterValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());
+            });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
